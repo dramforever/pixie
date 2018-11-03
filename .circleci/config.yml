@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  build:
+    machine:
+      enabled: true
+      image: circleci/classic:201808-01
+    steps:
+      - checkout
+      - run: |
+          cd .circleci
+          sudo cp daemon.json /etc/docker/
+          sudo systemctl restart docker
+          docker login -u terrorjack -p $DOCKER_PASS
+          docker build --squash -t terrorjack/pixie:latest .
+          docker build -f debian.Dockerfile --squash -t terrorjack/pixie:debian .
+          docker push terrorjack/pixie:latest
+          docker push terrorjack/pixie:debian
